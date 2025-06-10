@@ -1,6 +1,7 @@
 package com.github.slycucumber7.clearskies;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -27,6 +28,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONObject;
 
@@ -34,11 +38,16 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
     DBHelper database;
     DataModel model;
+    private FusedLocationProviderClient fusedLocationClient;
+
+    Location recentLocation;
     String currentDate;
     TextView tv;
     double[] latlong;
+
     private static final int PERMISSION_REQUEST_CODE = 1;
     private static boolean PERMISSION_STATE = false;
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,11 +71,30 @@ public class MainActivity extends AppCompatActivity {
 
         checkAppPermissions();
 
+// get location here
+
+fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        checkAppPermissions();
+        if(PERMISSION_STATE == true){
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if(location != null){
+                                recentLocation = location;
+                            }
+                        }
+                    });
+        }
 
 
 
 
-       //end location setup
+
+
+
+
+// end location setup
 
 
 
