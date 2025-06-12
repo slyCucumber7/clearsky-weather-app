@@ -33,7 +33,7 @@ public class LocationHelper {
 
     }
 
-
+   //this is a comment
 
     public double[] getLocation() {
         return new double[]{lattitude, longitude};
