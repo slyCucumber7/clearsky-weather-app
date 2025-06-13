@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -29,7 +30,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONObject;
@@ -41,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
 
     Location recentLocation;
+    LocationCallback mLocationCallBack;
     String currentDate;
     TextView tv;
     double[] latlong;
@@ -55,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        tv = findViewById(R.id.textView);
+        tv = findViewById(R.id.displayWindow);
 
 
 /// Current: figure out how to use permission result callback in location helper
@@ -69,23 +75,29 @@ public class MainActivity extends AppCompatActivity {
 //       LocationHelper locationHelper = new LocationHelper(this);
 //       latlong = locationHelper.getLocation();
 
-        checkAppPermissions();
+
 
 // get location here
 
-fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        checkAppPermissions();
-        if(PERMISSION_STATE == true){
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                        @Override
-                        public void onSuccess(Location location) {
-                            if(location != null){
-                                recentLocation = location;
-                            }
-                        }
-                    });
+checkAppPermissions();
+if(PERMISSION_STATE){
+    LocationRequest.Builder mReqB = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,20000);
+    LocationRequest mReq = mReqB.build();
+     mLocationCallBack = new LocationCallback() {
+        @Override
+        public void onLocationResult(@NonNull LocationResult locationResult) {
+            Location tempLocation = locationResult.getLastLocation();
+            if(tempLocation != null){
+                recentLocation = locationResult.getLastLocation();
+            }
         }
+    };
+    LocationServices.getFusedLocationProviderClient(this).requestLocationUpdates(mReq,mLocationCallBack,null);
+}
+
+//To stop location updates:
+//        LocationServices.getFusedLocationProviderClient(this).removeLocationUpdates(mLocationCallBack);
+
 
 
 
@@ -138,10 +150,6 @@ fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
 
-//this comment is a test
-
-
-
 
 
 
@@ -158,6 +166,48 @@ fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
 
     } //end on create
+
+//    public void testLocation(View v){
+//        updateLocation();
+//        if(recentLocation != null){
+//            String result = recentLocation.toString();
+//            tv.setText(result);
+//        }
+//        else{
+//            tv.setText("Location is null.");
+//        }
+//    }
+
+    public void testLocationAgain(View view){
+        if(recentLocation != null){
+            String res = recentLocation.toString();
+            tv.setText(res);
+        }
+        else{
+            tv.setText("Location is null.");
+        }
+    }
+
+// This method updates the saved location variable with the most recent device location, if it exists. (unreliable)
+//    @SuppressLint("MissingPermission")
+//    public void updateLocation(){
+//        checkAppPermissions();
+//        if(PERMISSION_STATE){
+//            fusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            if(location != null){
+//                                recentLocation = location;
+//                            }
+//                        }
+//                    });
+//        }
+//        else{
+//            Log.d("Location update","Failed");
+//        }
+//    }
+
 
     //Permission handling code
 
@@ -221,7 +271,23 @@ fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     // end permission handling code
 
 
-
+//no longer needed
+    //fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+//            if(PERMISSION_STATE){
+//                fusedLocationClient.getLastLocation()
+//                        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+//                            @Override
+//                            public void onSuccess(Location location) {
+//                                if(location != null){
+//                                    recentLocation = location;
+//
+//                                }
+//                                else{
+//                                    Log.d("Location state","Not accessible");
+//                                }
+//                            }
+//                        });
+//            }
 
 
 
