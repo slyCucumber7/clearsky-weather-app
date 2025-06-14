@@ -41,16 +41,10 @@ import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
-    DBHelper database;
-    DataModel model;
     private FusedLocationProviderClient fusedLocationClient;
-
     Location recentLocation;
     LocationCallback mLocationCallBack;
-    String currentDate;
     TextView tv;
-    double[] latlong;
-
     private static final int PERMISSION_REQUEST_CODE = 1;
     private static boolean PERMISSION_STATE = false;
     @SuppressLint("MissingPermission")
@@ -62,19 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         tv = findViewById(R.id.displayWindow);
-
-
-/// Current: figure out how to use permission result callback in location helper
-/// Next:    Build http request string from location
-
-
-
-
-
-        //location setup
-//       LocationHelper locationHelper = new LocationHelper(this);
-//       latlong = locationHelper.getLocation();
-
 
 
 // get location here
@@ -101,21 +82,9 @@ if(PERMISSION_STATE){
 
 
 
-
-
-
-
-
 // end location setup
 
 
-
-
-        //database setup
-
-        //database = new DBHelper(this);
-
-        //END database setup
 
 
         //JSON request proof of concept using Android Volley
@@ -151,12 +120,6 @@ if(PERMISSION_STATE){
 
 
 
-
-
-
-
-
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -167,47 +130,21 @@ if(PERMISSION_STATE){
 
     } //end on create
 
-//    public void testLocation(View v){
-//        updateLocation();
-//        if(recentLocation != null){
-//            String result = recentLocation.toString();
-//            tv.setText(result);
-//        }
-//        else{
-//            tv.setText("Location is null.");
-//        }
-//    }
 
-    public void testLocationAgain(View view){
+    public void pushLocationToTv(View view){
         if(recentLocation != null){
-            String res = recentLocation.toString();
-            tv.setText(res);
-        }
-        else{
-            tv.setText("Location is null.");
+            String temp = "Lat, long: " + recentLocation.getLatitude() + ", " +  recentLocation.getLongitude();
+            tv.setText(temp);
+            String foo = buildRequest();
+            Log.d("String result: ",foo);
         }
     }
 
-// This method updates the saved location variable with the most recent device location, if it exists. (unreliable)
-//    @SuppressLint("MissingPermission")
-//    public void updateLocation(){
-//        checkAppPermissions();
-//        if(PERMISSION_STATE){
-//            fusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            if(location != null){
-//                                recentLocation = location;
-//                            }
-//                        }
-//                    });
-//        }
-//        else{
-//            Log.d("Location update","Failed");
-//        }
-//    }
-
+    public String buildRequest(){
+        //https://api.open-meteo.com/v1/forecast?latitude=52.52&longitude=13.41&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,visibility,cloud_cover,wind_speed_10m&timezone=auto&forecast_days=1
+        String format = "https://api.open-meteo.com/v1/forecast?latitude=%.2f&longitude=%.2f&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,visibility,cloud_cover,wind_speed_10m&timezone=auto&forecast_days=1";
+        return (recentLocation != null) ? String.format(format,recentLocation.getLatitude(),recentLocation.getLongitude()) : "Recent location is null.";
+    }
 
     //Permission handling code
 
@@ -271,23 +208,6 @@ if(PERMISSION_STATE){
     // end permission handling code
 
 
-//no longer needed
-    //fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-//            if(PERMISSION_STATE){
-//                fusedLocationClient.getLastLocation()
-//                        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-//                            @Override
-//                            public void onSuccess(Location location) {
-//                                if(location != null){
-//                                    recentLocation = location;
-//
-//                                }
-//                                else{
-//                                    Log.d("Location state","Not accessible");
-//                                }
-//                            }
-//                        });
-//            }
 
 
 

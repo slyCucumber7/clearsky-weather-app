@@ -34,7 +34,7 @@
                 android:id="@+id/button"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:onClick="testLocationAgain"
+                android:onClick="pushLocationToTv"
                 android:text="Button" />
 
 
